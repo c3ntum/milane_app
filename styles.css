@@ -61,3 +61,34 @@ body {
 .bottom-nav a:hover {
   color: #fff;
 }
+/* Prevent iOS Safari auto-zoom */
+input, select {
+  font-size: 16px !important;
+}
+
+/* Table mobile scrolling fix */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure body bottom padding so Bottom-Nav does not overlap content */
+body {
+  padding-bottom: 90px !important;
+}
+
+/* Make cards fit better on iPhone */
+.card-glass {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+/* Force container max width for large iPhones */
+.container {
+  max-width: 600px;
+}
+
+/* Fix bottom nav overlap on iPhone */
+.bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
