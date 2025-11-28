@@ -1,0 +1,10 @@
+/* iPhone Splashscreen */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #0c0f16;
+  }
+}
+
+.link-apple-touch-startup-image {
+  display: none;
+}
