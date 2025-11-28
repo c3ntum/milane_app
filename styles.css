@@ -1,50 +1,115 @@
-body {
-  background: radial-gradient(circle at top, #343a40 0, #000 55%);
+/* ============= GENERAL APP SETUP ============= */
+html, body {
+  height: 100%;
+  min-height: 100%;
 }
 
-/* Glasoptik */
-.card-glass {
-  background: rgba(33, 37, 41, 0.85);
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
+body {
+  margin: 0;
+  padding-bottom: 110px !important;
+    background: linear-gradient(
+    180deg,
+    rgba(58,44,120,1) 0%,
+    rgba(32,29,56,1) 35%,
+    rgba(18,18,28,1) 70%,
+    rgba(12,15,22,1) 100%
+  );
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+/* ============= CARDS ============= */
+
+.card-glass {
+  background: rgba(25, 27, 33, 0.92);
+  border-radius: 24px;
+  border: none;
+  padding: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+  color:white;
+}
+
+.card-glass h5, .card-glass h6 {
+  letter-spacing: 0.5px;
+}
+
+/* Title style (light gray small uppercase) */
+.text-muted {
+  color: #a8b4c4 !important;
+}
+
+/* ============= ICON CIRCLE ============= */
 
 .icon-circle {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
+  background: #1e2129;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #cfd3df;
+  font-size: 24px;
 }
 
-/* iPhone maximales Layout */
-.container {
-  max-width: 540px;
+/* ============= BUTTONS ============= */
+
+.btn-primary {
+  background: #6c54ff;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 0;
+  font-size: 17px;
+  font-weight: 600;
 }
 
-/* BOTTOM NAV – wie iOS */
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ============= TABLES ============= */
+
+.table-dark {
+  background: transparent !important;
+}
+
+.table-dark td, .table-dark th {
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============= BOTTOM NAV ============= */
+
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
 
-  background: rgba(0,0,0,0.92);
-  padding: 8px 0;
+  padding: 12px 0 calc(env(safe-area-inset-bottom) + 12px);
+  background: rgba(15, 17, 23, 0.9);
+  backdrop-filter: blur(20px);
 
   display: flex;
-  justify-content: space-around;
-  border-top: 1px solid rgba(255,255,255,0.1);
-
-  backdrop-filter: blur(20px);
+  justify-content: space-evenly;
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
 
 .bottom-nav a {
   text-decoration: none;
-  color: #aaa;
+  color: #b7bbc5;
   font-size: 12px;
 
   display: flex;
@@ -57,38 +122,29 @@ body {
   margin-bottom: 2px;
 }
 
-.bottom-nav a.active,
-.bottom-nav a:hover {
-  color: #fff;
+.bottom-nav a.active {
+  color: #ffffff;
 }
-/* Prevent iOS Safari auto-zoom */
-input, select {
+
+/* ============= INPUTS ============= */
+
+input, select, textarea {
   font-size: 16px !important;
+  background: #101217 !important;
+  border: 1px solid #2a2f39 !important;
+  color: #fff !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
 }
 
-/* Table mobile scrolling fix */
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+/* Result box */
+.result-box {
+  background: #1a1d24;
+  padding: 18px;
+  border-radius: 20px;
+  margin-top: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Ensure body bottom padding so Bottom-Nav does not overlap content */
-body {
-  padding-bottom: 90px !important;
-}
 
-/* Make cards fit better on iPhone */
-.card-glass {
-  margin-left: 6px;
-  margin-right: 6px;
-}
 
-/* Force container max width for large iPhones */
-.container {
-  max-width: 600px;
-}
-
-/* Fix bottom nav overlap on iPhone */
-.bottom-nav {
-  padding-bottom: env(safe-area-inset-bottom);
-}
