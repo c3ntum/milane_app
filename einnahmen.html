@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Einnahmen – Milane Tattoo Studio</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-dark text-light">
+
+  <div class="container pt-3 pb-5">
+
+    <!-- HEADER -->
+    <header class="mb-4">
+      <h1 class="h4 mb-0">
+        <i class="bi bi-wallet2 me-2"></i>Einnahmen
+      </h1>
+      <small class="text-muted">Vivo Life AG – Finanzen</small>
+    </header>
+
+
+    <!-- INPUT CARD -->
+    <div class="card card-glass mb-4">
+      <div class="card-body">
+        <h5 class="text-uppercase text-muted mb-3">
+          <i class="bi bi-plus-circle me-2"></i>Eintrag hinzufügen
+        </h5>
+
+        <form id="form">
+          <input type="text" id="name" class="form-control mb-2" placeholder="Name" required>
+          <input type="number" step="0.01" id="betrag" class="form-control mb-3" placeholder="Betrag (CHF)" required>
+
+          <button class="btn btn-primary w-100">
+            <i class="bi bi-save me-1"></i>Speichern
+          </button>
+        </form>
+
+        <p id="status" class="mt-2"></p>
+      </div>
+    </div>
+
+
+    <!-- TABLE CARD -->
+    <div class="card card-glass mb-4">
+      <div class="card-body">
+
+        <h5 class="text-uppercase text-muted mb-3">
+          <i class="bi bi-list-ul me-2"></i>Alle Einträge
+        </h5>
+
+        <div class="table-responsive small">
+          <table class="table table-dark table-sm align-middle mb-0" id="liste">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Betrag</th>
+                <th>Löschen</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- SUM CARD -->
+    <div class="card card-glass">
+      <div class="card-body">
+        <h5 class="text-uppercase text-muted mb-3">
+          <i class="bi bi-calculator me-2"></i>Totals
+        </h5>
+
+        <p class="mb-1"><strong>Total:</strong> <span id="total">0.00</span> CHF</p>
+        <p class="mb-1"><strong>40%:</strong> <span id="p40">0.00</span> CHF</p>
+        <p><strong>60%:</strong> <span id="p60">0.00</span> CHF</p>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a href="index.html">
+      <i class="bi bi-house-door"></i>
+      <span>Home</span>
+    </a>
+
+    <a href="rechner.html">
+      <i class="bi bi-calculator"></i>
+      <span>Rechner</span>
+    </a>
+
+    <a href="termine.html">
+      <i class="bi bi-calendar-check"></i>
+      <span>Termine</span>
+    </a>
+
+    <a href="einnahmen.html" class="active">
+      <i class="bi bi-wallet2"></i>
+      <span>Einnahmen</span>
+    </a>
+  </nav>
+
+
+
+
+
+<script>
+// === Supabase verbinden ===
+const supabaseClient = supabase.createClient(
+  "https://qnpufvlklhpjkuzifzeb.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucHVmdmxrbGhwamt1emlmemViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMjAxMTYsImV4cCI6MjA3OTg5NjExNn0.wY7565zw5j5qpoD8OMLa78QmjZ8PG6uhHaBO3xBwmJA"
+);
+
+
+// === Daten Laden ===
+async function ladeDaten() {
+  const { data, error } = await supabaseClient
+    .from("eintraege")
+    .select("*")
+    .order("id", { ascending: false });
+
+  const tbody = document.querySelector("#liste tbody");
+  tbody.innerHTML = "";
+
+  let total = 0;
+
+  if (!error) {
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${row.id}</td>
+        <td>${row.name}</td>
+        <td>${parseFloat(row.betrag).toFixed(2)}</td>
+        <td><span class="text-danger fw-bold" style="cursor:pointer" onclick="deleteEintrag(${row.id})">🗑️</span></td>
+      `;
+
+      tbody.appendChild(tr);
+      total += parseFloat(row.betrag);
+    });
+  }
+
+  document.getElementById("total").textContent = total.toFixed(2);
+  document.getElementById("p40").textContent = (total * 0.40).toFixed(2);
+  document.getElementById("p60").textContent = (total * 0.60).toFixed(2);
+}
+
+
+// === Speichern ===
+document.getElementById("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const betrag = document.getElementById("betrag").value;
+
+  const { error } = await supabaseClient
+    .from("eintraege")
+    .insert([{ name: name, betrag: betrag }]);
+
+  if (error) {
+    document.getElementById("status").innerHTML = "❌ Fehler: " + error.message;
+  } else {
+    document.getElementById("status").innerHTML = "✅ Gespeichert!";
+    document.getElementById("form").reset();
+    ladeDaten();
+  }
+});
+
+
+// === Löschen ===
+async function deleteEintrag(id) {
+  if (!confirm("Diesen Eintrag wirklich löschen?")) return;
+
+  const { error } = await supabaseClient
+    .from("eintraege")
+    .delete()
+    .eq("id", id);
+
+  if (error) alert("Fehler: " + error.message);
+  else ladeDaten();
+}
+
+
+// Start
+ladeDaten();
+</script>
+
+</body>
+</html>
