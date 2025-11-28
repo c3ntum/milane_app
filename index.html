@@ -17,24 +17,39 @@
 
   <div class="container pt-3 pb-5">
 
-    <!-- HEADER -->
-    <header class="mb-4">
-      <h1 class="h4 mb-0"><i class="bi bi-stars me-2"></i>Milane Tattoo Studio</h1>
-      <small class="text-muted">Vivo Life AG – Dashboard</small>
-    </header>
+<!-- HEADER -->
+<header class="mb-4 text-center">
+  <h1 class="h4 mb-1">
+    <i class="bi bi-stars me-2"></i>Milane Tattoo Studio
+  </h1>
+  <small class="text-muted">Vivo Life AG – Dashboard</small>
+</header>
 
-    <!-- DASHBOARD -->
-    <div class="card card-glass mb-3">
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-          <h6 class="text-uppercase text-muted mb-1">Gesamteinnahmen</h6>
-          <p class="h3 mb-0" id="total-income">CHF 0.00</p>
-        </div>
-        <div class="icon-circle">
-          <i class="bi bi-cash-stack fs-3"></i>
-        </div>
-      </div>
+<!-- LOGO -->
+<div class="text-center mb-4">
+  <img 
+    src="logo.png" 
+    alt="Milane Logo" 
+    style="
+      width: 120px; 
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+    "
+  >
+</div>
+
+<!-- DASHBOARD -->
+<div class="card card-glass mb-3">
+  <div class="card-body d-flex justify-content-between align-items-center">
+    <div>
+      <h6 class="text-uppercase text-muted mb-1">Gesamteinnahmen</h6>
+      <p class="h3 mb-0" id="total-income">CHF 0.00</p>
     </div>
+    <div class="icon-circle">
+      <i class="bi bi-cash-stack fs-3"></i>
+    </div>
+  </div>
+</div>
+
 
     <!-- NÄCHSTE TERMINE -->
     <div class="card card-glass">
@@ -77,71 +92,121 @@
     </a>
   </nav>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.7/dist/umd/supabase.min.js"></script>
+<!-- Supabase (v1 UMD) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.7/dist/umd/supabase.min.js"></script>
 
-  <!-- HOME PAGE LOGIC -->
-  <script>
-    const SUPABASE_URL = "YOUR_SUPABASE_URL";
-    const SUPABASE_KEY = "YOUR_SUPABASE_KEY";
+<script>
+  const SUPABASE_URL = "https://qnpufvlklhpjkuzifzeb.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucHVmdmxrbGhwamt1emlmemViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMjAxMTYsImV4cCI6MjA3OTg5NjExNn0.wY7565zw5j5qpoD8OMLa78QmjZ8PG6uhHaBO3xBwmJA";
 
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Supabase Client
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadIncome();
-      loadNextAppointments();
+  document.addEventListener("DOMContentLoaded", () => {
+    loadIncome();
+    loadNextAppointments();
+  });
+
+  /* ============================================================
+     LADEN DES GESAMTBETRAGS (CORRECT VERSION)
+     ============================================================ */
+  async function loadIncome() {
+    const el = document.getElementById("total-income");
+
+    // Deine Tabelle = eintraege, Spalte = betrag
+    const { data, error } = await db
+      .from("eintraege")
+      .select("betrag");
+
+    if (error) {
+      console.error("Supabase Fehler beim Laden:", error);
+      el.textContent = "CHF 0.00";
+      return;
+    }
+
+    let total = 0;
+
+    (data || []).forEach(entry => {
+      total += parseFloat(entry.betrag || 0);
     });
 
+    el.textContent = `CHF ${total.toFixed(2)}`;
+  }
 
-    async function loadIncome() {
-      const el = document.getElementById("total-income");
 
-      const { data } = await db.from("incomes").select("amount");
+  /* ============================================================
+     NÄCHSTE TERMINE LADEN (2 Termine)
+     ============================================================ */
+  async function loadNextAppointments() {
+    const list = document.getElementById("next-appointments-list");
 
-      let total = 0;
-      (data || []).forEach(row => total += Number(row.amount || 0));
+    const now = new Date().toISOString();
 
-      el.textContent = `CHF ${total.toFixed(2)}`;
-    }
+    const { data, error } = await db
+      .from("appointments")
+      .select("*")
+      .gt("date_time", now)
+      .order("date_time", { ascending: true })
+      .limit(2);
 
-    async function loadNextAppointments() {
-      const list = document.getElementById("next-appointments-list");
+if (error) {
+  console.error("Fehler beim Laden der Termine:", error);
+  list.innerHTML = `
+    <li class="list-group-item bg-transparent text-danger border-0">
+      Fehler beim Laden
+    </li>`;
+  return;
+}
 
-      const now = new Date().toISOString();
+list.innerHTML = "";
 
-      const { data } = await db
-        .from("appointments")
-        .select("*")
-        .gt("date_time", now)
-        .order("date_time", { ascending: true })
-        .limit(2);
+// Keine Termine?
+if (!data || data.length === 0) {
+  list.innerHTML = `
+    <li class="list-group-item bg-transparent text-muted border-0">
+      Keine kommenden Termine
+    </li>`;
+  return;
+}
 
-      list.innerHTML = "";
+data.forEach(appt => {
+  const dt = new Date(appt.date_time).toLocaleString("de-CH", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
 
-      if (!data || data.length === 0) {
-        list.innerHTML = `
-          <li class="list-group-item bg-transparent text-muted border-0">
-            Keine kommenden Termine
-          </li>`;
-        return;
-      }
+  list.innerHTML += `
+    <li class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center py-2">
 
-      data.forEach(appt => {
-        const dt = new Date(appt.date_time).toLocaleString("de-CH", {
-          day: "2-digit", month: "2-digit",
-          hour: "2-digit", minute: "2-digit"
-        });
+      <div>
+        <strong style="color:#ffffff;">${appt.client_name}</strong><br>
+        <small style="color:#dddddd;">${dt}</small>
+      </div>
 
-        list.innerHTML += `
-          <li class="list-group-item bg-transparent border-0 d-flex justify-content-between">
-            <div>
-              <strong>${appt.client_name}</strong><br>
-              <small class="text-muted">${dt}</small>
-            </div>
-            <span class="badge bg-light text-dark">CHF ${Number(appt.price).toFixed(2)}</span>
-          </li>`;
-      });
-    }
-  </script>
+      <span 
+        class="d-flex align-items-center"
+        style="
+          background-color: #143d1f;
+          color: #7CFF9E;
+          padding: 8px 14px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 14px;
+          gap: 6px;
+        "
+      >
+        <i class="bi bi-cash-stack" style="font-size: 16px;"></i>
+        CHF ${Number(appt.price || 0).toFixed(2)}
+      </span>
+
+    </li>
+  `;
+});
+
+  }
+</script>
+
 </body>
 </html>
