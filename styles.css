@@ -1,0 +1,63 @@
+body {
+  background: radial-gradient(circle at top, #343a40 0, #000 55%);
+}
+
+/* Glasoptik */
+.card-glass {
+  background: rgba(33, 37, 41, 0.85);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* iPhone maximales Layout */
+.container {
+  max-width: 540px;
+}
+
+/* BOTTOM NAV – wie iOS */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: rgba(0,0,0,0.92);
+  padding: 8px 0;
+
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid rgba(255,255,255,0.1);
+
+  backdrop-filter: blur(20px);
+}
+
+.bottom-nav a {
+  text-decoration: none;
+  color: #aaa;
+  font-size: 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bottom-nav a i {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.bottom-nav a.active,
+.bottom-nav a:hover {
+  color: #fff;
+}
